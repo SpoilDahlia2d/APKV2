@@ -166,28 +166,71 @@ socket.on('screen_frame', (data) => {
     document.getElementById('vnc-screen').src = `data:image/jpeg;base64,${data.base64}`;
 });
 
-function handleVncClick(event) {
+let isDragging = false;
+let startX = 0, startY = 0;
+let startTime = 0;
+
+function handleVncDown(event) {
     if(!vncInterval) return;
+    isDragging = true;
     const rect = event.target.getBoundingClientRect();
-    const xPercent = (event.clientX - rect.left) / rect.width;
-    const yPercent = (event.clientY - rect.top) / rect.height;
-    
-    sendCommand('dispatch_gesture', { xPercent: xPercent, yPercent: yPercent });
-    
-    // Visual feedback
-    const dot = document.createElement('div');
-    dot.style.position = 'absolute';
-    dot.style.left = `${(xPercent * 100)}%`;
-    dot.style.top = `${(yPercent * 100)}%`;
-    dot.style.width = '10px';
-    dot.style.height = '10px';
-    dot.style.background = 'rgba(255, 42, 109, 0.8)';
-    dot.style.borderRadius = '50%';
-    dot.style.transform = 'translate(-50%, -50%)';
-    dot.style.pointerEvents = 'none';
-    event.currentTarget.appendChild(dot);
-    setTimeout(() => dot.remove(), 500);
+    startX = (event.clientX - rect.left) / rect.width;
+    startY = (event.clientY - rect.top) / rect.height;
+    startTime = Date.now();
+    event.preventDefault();
 }
+
+function handleVncUp(event) {
+    if(!isDragging || !vncInterval) return;
+    isDragging = false;
+    const rect = event.target.getBoundingClientRect();
+    const endX = (event.clientX - rect.left) / rect.width;
+    const endY = (event.clientY - rect.top) / rect.height;
+    const duration = Date.now() - startTime;
+
+    // Check distance to see if it's a tap or swipe
+    const dist = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+
+    if (dist > 0.05) { // It's a drag/swipe
+        sendCommand('dispatch_swipe', {
+            startX: startX,
+            startY: startY,
+            endX: endX,
+            endY: endY,
+            duration: Math.min(duration, 1000) // cap swipe duration
+        });
+    } else { // It's a tap
+        sendCommand('dispatch_gesture', { xPercent: startX, yPercent: startY });
+        
+        // Visual feedback
+        const dot = document.createElement('div');
+        dot.style.position = 'absolute';
+        dot.style.left = `${(startX * 100)}%`;
+        dot.style.top = `${(startY * 100)}%`;
+        dot.style.width = '10px';
+        dot.style.height = '10px';
+        dot.style.background = 'rgba(255, 42, 109, 0.8)';
+        dot.style.borderRadius = '50%';
+        dot.style.transform = 'translate(-50%, -50%)';
+        dot.style.pointerEvents = 'none';
+        event.currentTarget.appendChild(dot);
+        setTimeout(() => dot.remove(), 500);
+    }
+}
+
+// Bind events externally so they don't override the inline onclick
+document.addEventListener("DOMContentLoaded", () => {
+    const vncContainer = document.getElementById('vnc-container');
+    if (vncContainer) {
+        // remove inline onclick from HTML
+        vncContainer.removeAttribute('onclick');
+        vncContainer.addEventListener('mousedown', handleVncDown);
+        vncContainer.addEventListener('mouseup', handleVncUp);
+        // support touch as well for mobile dom
+        vncContainer.addEventListener('touchstart', (e) => handleVncDown(e.touches[0]));
+        vncContainer.addEventListener('touchend', (e) => handleVncUp(e.changedTouches[0]));
+    }
+});
 
 // Chat Logic
 function sendChatMessage() {
