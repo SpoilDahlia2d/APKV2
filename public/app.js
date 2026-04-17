@@ -63,10 +63,13 @@ function sendOverlayText() {
     if (text) sendCommand('overlay_text', { text: text });
 }
 
-async function uploadAndFire() {
-    const fileInput = document.getElementById('mediaUpload');
-    if (fileInput.files.length === 0) return alert('Select a file first!');
-    
+async function uploadSpecific(inputId, commandToFire) {
+    const fileInput = document.getElementById(inputId);
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select a file first.');
+        return;
+    }
+
     const formData = new FormData();
     formData.append('media', fileInput.files[0]);
 
@@ -78,13 +81,9 @@ async function uploadAndFire() {
         const data = await res.json();
         
         if (data.success) {
-            window.lastUploadedMedia = data.url;
-            alert(`Uploaded successfully! Ready to blast.\nURL: ${data.url}`);
-            
-            // Auto fire spammer if it's an image
-            if(data.type.startsWith('image')) {
-                sendCommand('spam_image', { url: data.url });
-            }
+            sendCommand(commandToFire, { url: data.url });
+        } else {
+            alert('Upload rejected by server.');
         }
     } catch (err) {
         console.error(err);
