@@ -16,16 +16,31 @@ socket.on('device_list_update', (devices) => {
     
     if (devices.length === 0) {
         ul.innerHTML = '<li class="empty-state">Waiting for connections...</li>';
+        // Auto-select broadcast if everyone disconnects
+        if (currentTarget !== 'all') {
+            currentTarget = 'all';
+            document.getElementById('selected-target-lbl').innerHTML = `Target: <span class="accent">Global Broadcast</span>`;
+        }
         return;
     }
 
+    let targetStillExists = false;
+
     devices.forEach(dev => {
+        if (currentTarget === dev.socketId) targetStillExists = true;
         const li = document.createElement('li');
         li.className = `device-item ${currentTarget === dev.socketId ? 'active' : ''}`;
+        li.dataset.socketId = dev.socketId;
         li.innerHTML = `<strong>${dev.id}</strong><br><small style="color:var(--text-muted)">${dev.model}</small>`;
         li.onclick = () => selectTarget(dev.socketId, dev.id);
         ul.appendChild(li);
     });
+
+    // If the target we previously had selected disconnected, fall back to broadcast
+    if (!targetStillExists && currentTarget !== 'all') {
+        currentTarget = 'all';
+        document.getElementById('selected-target-lbl').innerHTML = `Target: <span class="accent">Global Broadcast</span>`;
+    }
 });
 
 function selectTarget(socketId, name) {
@@ -33,8 +48,14 @@ function selectTarget(socketId, name) {
     document.getElementById('selected-target-lbl').innerHTML = `Target: <span class="accent">${name}</span>`;
     
     // Update active class
-    document.querySelectorAll('.device-item').forEach(el => el.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    document.querySelectorAll('.device-item').forEach(el => {
+        el.classList.remove('active');
+        if (el.dataset.socketId === socketId) el.classList.add('active');
+    });
+    
+    // Clear chat when switching targets
+    const windowEl = document.getElementById('chat-window');
+    windowEl.innerHTML = `<div style="color: var(--text-muted); text-align: center; margin-top: auto; margin-bottom: auto;">Connected to ${name}</div>`;
 }
 
 document.getElementById('broadcast-btn').onclick = () => {
@@ -146,10 +167,10 @@ function startStream() {
     if(!currentTarget || currentTarget === 'all') return alert("Select a specific target first.");
     document.getElementById('vnc-overlay').style.display = 'none';
     
-    // Request stream frame every 1s
+    // Request stream frame roughly every 800ms
     vncInterval = setInterval(() => {
         sendCommand('request_frame');
-    }, 1500);
+    }, 800);
 }
 
 function stopStream() {

